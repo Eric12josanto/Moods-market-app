@@ -1,11 +1,11 @@
 import streamlit as st
 
-# Custom CSS for updated theme (black text, pale green boxes, plain fonts)
+# Custom CSS for updated theme
 st.markdown("""
     <style>
     .main {
-        background-color: #E0F7E0;
-        color: #000000;
+        background-color: #FFFFFF;
+        
     }
     h1 {
         color: #000000;
@@ -13,6 +13,13 @@ st.markdown("""
         font-size: 2.5em;
     }
     h3 {
+        color: #000000;
+    }
+    .stRadio > label, .stSelectbox > label {
+        color: #00008B;
+        font-size: 1.1em;
+    }
+    .stRadio > div > label, .stSelectbox > div > label {
         color: #000000;
     }
     .stRadio > div, .stSelectbox > div {
@@ -49,16 +56,16 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Title with dollar sign and gold coin emoji
-st.title("💵 Wealthy Cardamom Market 💰")
+# Updated title with same emojis
+st.title("💵 MOODS- The market App 💰")
 
 # Add a decorative subheader
 st.markdown("<h3 class='coin-animation'>Grow Your Riches with Smart Market Moves!</h3>", unsafe_allow_html=True)
 
-# User type selection
+# User type selection with dark blue label
 user_type = st.radio("💎 Select Your Role:", ("Farmer", "Trader"))
 
-# Month selection
+# Month selection with dark blue label
 months = [
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
@@ -263,8 +270,8 @@ def get_month_pair(current_month):
     prev_month = months[(months.index(current_month) - 1) % 12]
     return f"{prev_month[:3]}-{current_month[:3]}"
 
-# Analysis button
-if st.button("💸 Analyze Your Wealth Opportunity 💸"):
+# Updated button text with same emojis
+if st.button("💸 GO DEEP 💸"):
     if user_type == "Farmer":
         st.subheader(f"💰 This Month ({selected_month}) 💰")
         if selected_month in farmer_data:
