@@ -345,4 +345,5 @@ if st.button("💸 GO DEEP 💸"):
                      width="450" alt="Market Insights">
             </div>
             <p style="text-align: center; color: #000000;">Market Insights</p>
+            <p style="text-align: center; color: #000000;"><i></b>"The graph shows cardamom's month-on-month average price and quantity sold. Based on seasonal trends from 2015–2024 data."</b></i></p>
         """, unsafe_allow_html=True)
