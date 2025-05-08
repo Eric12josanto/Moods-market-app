@@ -256,6 +256,11 @@ st.markdown("""
         font-size: 1.5em;
         margin-right: 8px;
     }
+    .framed-image {
+        border: 6px solid #C4E4C4;  /* Pale green border, increased to 6px */
+        border-radius: 10px;        /* Rounded edges */
+        display: inline-block;      /* Inline-block to wrap tightly around the image */
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -273,61 +278,71 @@ selected_month = st.selectbox("📅 Select Month:", months)
 
 # Button
 if st.button("💸 GO DEEP 💸"):
-    # Display the image after button press with reduced size
-    st.image("https://github.com/Eric12josanto/Moods-market-app/raw/main/graphy.png", 
-             caption="Your Cardamom Market Guide", 
-             width=450)  # Set width to 450px (approximately half of default container width)
+    # Create a two-column layout
+    col1, col2 = st.columns([1.5, 1])  # Slightly more space for recommendations (left column)
 
-    if user_type == "Farmer":
-        st.subheader(f"💰 This Month ({selected_month}) 💰")
-        if selected_month in farmer_data:
-            data = farmer_data[selected_month]
-            st.write(f"**Price Trend**: {data['Price_Trend']}")
-            st.write(f"**Demand**: {data['Demand']}")
-            st.write(f"**Supply Impact**: {data['Supply_Impact']}")
-            st.write("**💎 Recommendation 💎**:")
-            for rec in data['Recommendation']:
-                st.write(f"- {rec}")
-        else:
-            st.write("**Status**: Limited data available.")
-            st.write("**Recommendation**: Hold until May or June for best prices.")
+    # Left column: Recommendations
+    with col1:
+        if user_type == "Farmer":
+            st.subheader(f"💰 This Month ({selected_month}) 💰")
+            if selected_month in farmer_data:
+                data = farmer_data[selected_month]
+                st.write(f"**Price Trend**: {data['Price_Trend']}")
+                st.write(f"**Demand**: {data['Demand']}")
+                st.write(f"**Supply Impact**: {data['Supply_Impact']}")
+                st.write("**💎 Recommendation 💎**:")
+                for rec in data['Recommendation']:
+                    st.write(f"- {rec}")
+            else:
+                st.write("**Status**: Limited data available.")
+                st.write("**Recommendation**: Hold until May or June for best prices.")
 
-        next_month = get_next_month(selected_month)
-        st.subheader(f"💰 Next Month ({next_month}) 💰")
-        if next_month in farmer_data:
-            data = farmer_data[next_month]
-            st.write(f"**Price Trend**: {data['Price_Trend']}")
-            st.write(f"**Demand**: {data['Demand']}")
-            st.write(f"**Supply Impact**: {data['Supply_Impact']}")
-            st.write("**💎 Recommendation 💎**:")
-            for rec in data['Recommendation']:
-                st.write(f"- {rec}")
-        else:
-            st.write("**Status**: Limited data available.")
-            st.write("**Recommendation**: Hold until May or June for best prices.")
-    else:  # Trader
-        current_pair = get_month_pair(selected_month)
-        next_month = get_next_month(selected_month)
-        next_pair = get_month_pair(next_month)
+            next_month = get_next_month(selected_month)
+            st.subheader(f"💰 Next Month ({next_month}) 💰")
+            if next_month in farmer_data:
+                data = farmer_data[next_month]
+                st.write(f"**Price Trend**: {data['Price_Trend']}")
+                st.write(f"**Demand**: {data['Demand']}")
+                st.write(f"**Supply Impact**: {data['Supply_Impact']}")
+                st.write("**💎 Recommendation 💎**:")
+                for rec in data['Recommendation']:
+                    st.write(f"- {rec}")
+            else:
+                st.write("**Status**: Limited data available.")
+                st.write("**Recommendation**: Hold until May or June for best prices.")
+        else:  # Trader
+            current_pair = get_month_pair(selected_month)
+            next_month = get_next_month(selected_month)
+            next_pair = get_month_pair(next_month)
 
-        st.subheader(f"💰 This Month ({selected_month}) 💰")
-        if current_pair in market_data:
-            data = market_data[current_pair]
-            st.write(f"**Price**: {data['Price']['Status']}")
-            st.write(f"**Demand**: {data['Demand']['Status']}")
-            st.write(f"**Supply**: {data['Supply']['Status']}")
-            st.write(f"**💎 Recommendation 💎**: {data['Trader_Recommendation']}")
-        else:
-            st.write("**Status**: Limited data available.")
-            st.write("**Recommendation**: Monitor market trends and adjust inventory cautiously.")
+            st.subheader(f"💰 This Month ({selected_month}) 💰")
+            if current_pair in market_data:
+                data = market_data[current_pair]
+                st.write(f"**Price**: {data['Price']['Status']}")
+                st.write(f"**Demand**: {data['Demand']['Status']}")
+                st.write(f"**Supply**: {data['Supply']['Status']}")
+                st.write(f"**💎 Recommendation 💎**: {data['Trader_Recommendation']}")
+            else:
+                st.write("**Status**: Limited data available.")
+                st.write("**Recommendation**: Monitor market trends and adjust inventory cautiously.")
 
-        st.subheader(f"💰 Next Month ({next_month}) 💰")
-        if next_pair in market_data:
-            data = market_data[next_pair]
-            st.write(f"**Price**: {data['Price']['Status']}")
-            st.write(f"**Demand**: {data['Demand']['Status']}")
-            st.write(f"**Supply**: {data['Supply']['Status']}")
-            st.write(f"**💎 Recommendation 💎**: {data['Trader_Recommendation']}")
-        else:
-            st.write("**Status**: Limited data available.")
-            st.write("**Recommendation**: Plan for stable inventory and pricing.")
+            st.subheader(f"💰 Next Month ({next_month}) 💰")
+            if next_pair in market_data:
+                data = market_data[next_pair]
+                st.write(f"**Price**: {data['Price']['Status']}")
+                st.write(f"**Demand**: {data['Demand']['Status']}")
+                st.write(f"**Supply**: {data['Supply']['Status']}")
+                st.write(f"**💎 Recommendation 💎**: {data['Trader_Recommendation']}")
+            else:
+                st.write("**Status**: Limited data available.")
+                st.write("**Recommendation**: Plan for stable inventory and pricing.")
+
+    # Right column: Image
+    with col2:
+        st.markdown("""
+            <div class="framed-image">
+                <img src="https://github.com/Eric12josanto/Moods-market-app/raw/main/graphy.png" 
+                     width="450" alt="Market Insights">
+            </div>
+            <p style="text-align: center; color: #000000;">Market Insights</p>
+        """, unsafe_allow_html=True)
