@@ -271,11 +271,13 @@ user_type = st.radio("💎 Select Your Role:", ("Farmer", "Trader"))
 # Month selection
 selected_month = st.selectbox("📅 Select Month:", months)
 
-# Add image above the button
-st.image("https://github.com/Eric12josanto/Moods-market-app/raw/main/graphy.png", caption="Your Cardamom Market Guide", use_container_width=True)
-
 # Button
 if st.button("💸 GO DEEP 💸"):
+    # Display the image after button press with reduced size
+    st.image("https://github.com/Eric12josanto/Moods-market-app/raw/main/graphy.png", 
+             caption="Your Cardamom Market Guide", 
+             width=450)  # Set width to 450px (approximately half of default container width)
+
     if user_type == "Farmer":
         st.subheader(f"💰 This Month ({selected_month}) 💰")
         if selected_month in farmer_data:
