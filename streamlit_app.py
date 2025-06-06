@@ -1,4 +1,7 @@
 import streamlit as st
+import pandas as pd
+import plotly.express as px
+from datetime import datetime
 
 # Define the months list first, as it's used by helper functions
 months = [
@@ -9,14 +12,14 @@ months = [
 # Helper functions
 def get_next_month(current_month):
     month_index = months.index(current_month)
-    next_month_index = (month_index + 1) % 12
+    next_month_index = (month_index + 12) % 12
     return months[next_month_index]
 
 def get_month_pair(current_month):
     prev_month = months[(months.index(current_month) - 1) % 12]
     return f"{prev_month[:3]}-{current_month[:3]}"
 
-# Farmer data (updated based on new tables)
+# Farmer data
 farmer_data = {
     "January": {
         "Price_Trend": "Slight price increase",
@@ -126,7 +129,7 @@ farmer_data = {
     }
 }
 
-# Trader data (updated directly from new tables)
+# Trader data
 market_data = {
     "Apr-May": {
         "Price": {"Score": -2, "Degree": 3, "Status": "Slight chance of price decrease"},
@@ -202,8 +205,10 @@ market_data = {
     }
 }
 
-# Disable Streamlit's theme override and set white background
-st.set_page_config(page_title="MOODS- The market App", layout="wide", initial_sidebar_state="collapsed")
+# Set page config
+st.set_page_config(page_title="MOODS- The Market App", layout="wide", initial_sidebar_state="expanded")
+
+# Custom CSS for styling
 st.markdown("""
     <style>
     .main {
@@ -218,14 +223,14 @@ st.markdown("""
     h3 {
         color: #000000;
     }
-    .stRadio > label, .stSelectbox > label {
+    .stRadio > label, .stSelectbox > label, .stDateInput > label {
         color: #00008B;
         font-size: 1.1em;
     }
     .stRadio > div > label, .stSelectbox > div > label {
         color: #000000;
     }
-    .stRadio > div, .stSelectbox > div {
+    .stRadio > div, .stSelectbox > div, .stDateInput > div {
         background-color: #E0F7E0;
         border: 2px solid #000000;
         border-radius: 8px;
@@ -257,93 +262,163 @@ st.markdown("""
         margin-right: 8px;
     }
     .framed-image {
-        border: 6px solid #C4E4C4;  /* Pale green border, increased to 6px */
-        border-radius: 10px;        /* Rounded edges */
-        display: inline-block;      /* Inline-block to wrap tightly around the image */
+        border: 6px solid #C4E4C4;
+        border-radius: 10px;
+        display: inline-block;
     }
     </style>
 """, unsafe_allow_html=True)
 
 # Title
-st.title("💵 MOODS- The market App 💰")
+st.title("💵 MOODS- The Market App 💰")
 
-# Subheader
-st.markdown("<h3 class='coin-animation'>Don’t know what to do with your cardamom? Let us handle it.</h3>", unsafe_allow_html=True)
+# Sidebar menu
+menu_option = st.sidebar.selectbox("Select Feature", ["Market Insights", "Price Predictor"])
 
-# User type selection
-user_type = st.radio("💎 Select Your Role:", ("Farmer", "Trader"))
+# Market Insights (Original Functionality)
+if menu_option == "Market Insights":
+    st.markdown("<h3 class='coin-animation'>Don’t know what to do with your cardamom? Let us handle it.</h3>", unsafe_allow_html=True)
 
-# Month selection
-selected_month = st.selectbox("📅 Select Month:", months)
+    # User type selection
+    user_type = st.radio("💎 Select Your Role:", ("Farmer", "Trader"))
 
-# Button
-if st.button("💸 GO DEEP 💸"):
-    # Create a two-column layout
-    col1, col2 = st.columns([1.5, 1])  # Slightly more space for recommendations (left column)
+    # Month selection
+    selected_month = st.selectbox("📅 Select Month:", months)
 
-    # Left column: Recommendations
-    with col1:
-        if user_type == "Farmer":
-            st.subheader(f"💰 This Month ({selected_month}) 💰")
-            if selected_month in farmer_data:
-                data = farmer_data[selected_month]
-                st.write(f"**Price Trend**: {data['Price_Trend']}")
-                st.write(f"**Demand**: {data['Demand']}")
-                st.write(f"**Supply Impact**: {data['Supply_Impact']}")
-                st.write("**💎 Recommendation 💎**:")
-                for rec in data['Recommendation']:
-                    st.write(f"- {rec}")
-            else:
-                st.write("**Status**: Limited data available.")
-                st.write("**Recommendation**: Hold until May or June for best prices.")
+    # Button
+    if st.button("💸 GO DEEP 💸"):
+        # Create a two-column layout
+        col1, col2 = st.columns([1.5, 1])
 
-            next_month = get_next_month(selected_month)
-            st.subheader(f"💰 Next Month ({next_month}) 💰")
-            if next_month in farmer_data:
-                data = farmer_data[next_month]
-                st.write(f"**Price Trend**: {data['Price_Trend']}")
-                st.write(f"**Demand**: {data['Demand']}")
-                st.write(f"**Supply Impact**: {data['Supply_Impact']}")
-                st.write("**💎 Recommendation 💎**:")
-                for rec in data['Recommendation']:
-                    st.write(f"- {rec}")
-            else:
-                st.write("**Status**: Limited data available.")
-                st.write("**Recommendation**: Hold until May or June for best prices.")
-        else:  # Trader
-            current_pair = get_month_pair(selected_month)
-            next_month = get_next_month(selected_month)
-            next_pair = get_month_pair(next_month)
+        # Left column: Recommendations
+        with col1:
+            if user_type == "Farmer":
+                st.subheader(f"💰 This Month ({selected_month}) 💰")
+                if selected_month in farmer_data:
+                    data = farmer_data[selected_month]
+                    st.write(f"**Price Trend**: {data['Price_Trend']}")
+                    st.write(f"**Demand**: {data['Demand']}")
+                    st.write(f"**Supply Impact**: {data['Supply_Impact']}")
+                    st.write("**💎 Recommendation 💎**:")
+                    for rec in data['Recommendation']:
+                        st.write(f"- {rec}")
+                else:
+                    st.write("**Status**: Limited data available.")
+                    st.write("**Recommendation**: Hold until May or June for best prices.")
 
-            st.subheader(f"💰 This Month ({selected_month}) 💰")
-            if current_pair in market_data:
-                data = market_data[current_pair]
-                st.write(f"**Price**: {data['Price']['Status']}")
-                st.write(f"**Demand**: {data['Demand']['Status']}")
-                st.write(f"**Supply**: {data['Supply']['Status']}")
-                st.write(f"**💎 Recommendation 💎**: {data['Trader_Recommendation']}")
-            else:
-                st.write("**Status**: Limited data available.")
-                st.write("**Recommendation**: Monitor market trends and adjust inventory cautiously.")
+                next_month = get_next_month(selected_month)
+                st.subheader(f"💰 Next Month ({next_month}) 💰")
+                if next_month in farmer_data:
+                    data = farmer_data[next_month]
+                    st.write(f"**Price Trend**: {data['Price_Trend']}")
+                    st.write(f"**Demand**: {data['Demand']}")
+                    st.write(f"**Supply Impact**: {data['Supply_Impact']}")
+                    st.write("**💎 Recommendation 💎**:")
+                    for rec in data['Recommendation']:
+                        st.write(f"- {rec}")
+                else:
+                    st.write("**Status**: Limited data available.")
+                    st.write("**Recommendation**: Hold until May or June for best prices.")
+            else:  # Trader
+                current_pair = get_month_pair(selected_month)
+                next_month = get_next_month(selected_month)
+                next_pair = get_month_pair(next_month)
 
-            st.subheader(f"💰 Next Month ({next_month}) 💰")
-            if next_pair in market_data:
-                data = market_data[next_pair]
-                st.write(f"**Price**: {data['Price']['Status']}")
-                st.write(f"**Demand**: {data['Demand']['Status']}")
-                st.write(f"**Supply**: {data['Supply']['Status']}")
-                st.write(f"**💎 Recommendation 💎**: {data['Trader_Recommendation']}")
-            else:
-                st.write("**Status**: Limited data available.")
-                st.write("**Recommendation**: Plan for stable inventory and pricing.")
+                st.subheader(f"💰 This Month ({selected_month}) 💰")
+                if current_pair in market_data:
+                    data = market_data[current_pair]
+                    st.write(f"**Price**: {data['Price']['Status']}")
+                    st.write(f"**Demand**: {data['Demand']['Status']}")
+                    st.write(f"**Supply**: {data['Supply']['Status']}")
+                    st.write(f"**💎 Recommendation 💎**: {data['Trader_Recommendation']}")
+                else:
+                    st.write("**Status**: Limited data available.")
+                    st.write("**Recommendation**: Monitor market trends and adjust inventory cautiously.")
 
-    # Right column: Image
-    with col2:
-        st.markdown("""
-            <div class="framed-image">
-                <img src="https://github.com/Eric12josanto/Moods-market-app/raw/main/graphy.png" 
-                     width="450" alt="Market Insights">
-            </div>
-            <p style="text-align: center; color: #000000;">Market Insights</p>
-            <p style="text-align: center; color: #000000;"><i></b>"The graph shows cardamom's month-on-month average price and quantity sold. Based on seasonal trends from 2015–2024 data."</b></i></p>
-        """, unsafe_allow_html=True)
+                st.subheader(f"💰 Next Month ({next_month}) 💰")
+                if next_pair in market_data:
+                    data = market_data[next_pair]
+                    st.write(f"**Price**: {data['Price']['Status']}")
+                    st.write(f"**Demand**: {data['Demand']['Status']}")
+                    st.write(f"**Supply**: {data['Supply']['Status']}")
+                    st.write(f"**💎 Recommendation 💎**: {data['Trader_Recommendation']}")
+                else:
+                    st.write("**Status**: Limited data available.")
+                    st.write("**Recommendation**: Plan for stable inventory and pricing.")
+
+        # Right column: Static Graph
+        with col2:
+            st.markdown("""
+                <div class="framed-image">
+                    <img src="https://github.com/Eric12josanto/Moods-market-app/raw/main/graphy.png" 
+                         width="450" alt="Market Insights">
+                </div>
+                <p style="text-align: center; color: #000000;">Market Insights</p>
+                <p style="text-align: center; color: #000000;"><i><b>"The graph shows cardamom's month-on-month average price and quantity sold. Based on seasonal trends from 2015–2024 data."</b></i></p>
+            """, unsafe_allow_html=True)
+
+# Price Predictor (New Functionality)
+elif menu_option == "Price Predictor":
+    st.markdown("<h3 class='coin-animation'>Check Cardamom Prices and Trends</h3>", unsafe_allow_html=True)
+
+    # Load data
+    try:
+        data = pd.read_excel('combined_prices_2015_2028.xlsx')
+    except FileNotFoundError:
+        st.error("Error: 'combined_prices_2015_2028.xlsx' not found in the project folder.")
+        st.stop()
+
+    # Prepare data
+    expected_columns = ['Year', 'Month', 'Predicted_Price']
+    if not all(col in data.columns for col in expected_columns):
+        st.error(f"Expected columns {expected_columns} not found. Actual columns: {data.columns.tolist()}")
+        st.stop()
+    data = data[expected_columns].copy()
+    data['Type'] = data['Year'].apply(lambda y: 'Historical' if y <= 2024 else 'Predicted')
+    data['Year_Month'] = data['Year'] + (data['Month'] - 1) / 12
+    data = data.sort_values(['Year', 'Month']).reset_index(drop=True)
+
+    # Date input
+    selected_date = st.date_input(
+        "📅 Select a Date (2015–2028):",
+        value=datetime(2025, 6, 15),
+        min_value=datetime(2015, 1, 1),
+        max_value=datetime(2028, 12, 31)
+    )
+
+    # Process selected date
+    if selected_date:
+        year = selected_date.year
+        month = selected_date.month
+
+        # Find price
+        price_row = data[(data['Year'] == year) & (data['Month'] == month)]
+        if price_row.empty:
+            st.write(f"No price data for {year}-{month:02d}.")
+        else:
+            price = price_row['Predicted_Price'].iloc[0]
+            st.markdown(f"**Price for {year}-{month:02d}: Rs. {price:.2f}/kg**")
+
+            # Prepare graph data
+            graph_data = data[
+                (data['Year'] < year) | 
+                ((data['Year'] == year) & (data['Month'] <= month))
+            ]
+
+            # Create graph
+            fig = px.line(
+                graph_data,
+                x='Year_Month',
+                y='Predicted_Price',
+                color='Type',
+                title=f"Cardamom Prices (2015 to {year}-{month:02d})",
+                labels={'Year_Month': 'Year', 'Predicted_Price': 'Price (Rs./kg)'}
+            )
+            fig.update_traces(line=dict(dash='dot'), selector=dict(name='Predicted'))
+            fig.update_xaxes(
+                tickvals=graph_data['Year_Month'].iloc[::12],
+                ticktext=graph_data['Year'].iloc[::12].astype(int),
+                range=[2015, year + month / 12]
+            )
+            fig.update_layout(showlegend=True)
+            st.plotly_chart(fig)
