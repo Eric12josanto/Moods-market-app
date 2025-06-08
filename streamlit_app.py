@@ -223,14 +223,14 @@ st.markdown("""
     h3 {
         color: #000000;
     }
-    .stRadio > label, .stSelectbox > label, .stDateInput > label {
+    .stRadio > label, .stSelectbox > label, .stDateInput > label, .stSlider > label {
         color: #00008B;
         font-size: 1.1em;
     }
-    .stRadio > div > label, .stSelectbox > div > label {
+    .stRadio > div > label, .stSelectbox > div > label, .stSlider > div > label {
         color: #000000;
     }
-    .stRadio > div, .stSelectbox > div, .stDateInput > div {
+    .stRadio > div, .stSelectbox > div, .stDateInput > div, .stSlider > div {
         background-color: #E0F7E0;
         border: 2px solid #000000;
         border-radius: 8px;
@@ -275,7 +275,7 @@ st.title("💵 MOODS- The Market App 💰")
 # Sidebar menu
 menu_option = st.sidebar.selectbox("Select Feature", ["Market Insights", "Price Predictor"])
 
-# Market Insights (Original Functionality)
+# Market Insights (Unchanged)
 if menu_option == "Market Insights":
     st.markdown("<h3 class='coin-animation'>Don’t know what to do with your cardamom? Let us handle it.</h3>", unsafe_allow_html=True)
 
@@ -357,7 +357,7 @@ if menu_option == "Market Insights":
                 <p style="text-align: center; color: #000000;"><i><b>"The graph shows cardamom's month-on-month average price and quantity sold. Based on seasonal trends from 2015–2024 data."</b></i></p>
             """, unsafe_allow_html=True)
 
-# Price Predictor (New Functionality)
+# Price Predictor (Updated with New Slider Label and Range)
 elif menu_option == "Price Predictor":
     st.markdown("<h3 class='coin-animation'>Check Cardamom Prices and Trends</h3>", unsafe_allow_html=True)
 
@@ -378,6 +378,28 @@ elif menu_option == "Price Predictor":
     data['Year_Month'] = data['Year'] + (data['Month'] - 1) / 12
     data = data.sort_values(['Year', 'Month']).reset_index(drop=True)
 
+    # Demand growth slider with updated label and range
+    demand_growth_percent = st.slider(
+        "📈 Select Annual Demand Growth Percentage:",
+        min_value=0,
+        max_value=50,
+        value=5,
+        step=1,
+        format="%d%%"
+    )
+    demand_growth = demand_growth_percent / 100  # Convert percentage to decimal
+
+    # Adjust predicted prices for demand growth
+    data['Adjusted_Price'] = data['Predicted_Price'].copy()
+    for idx, row in data.iterrows():
+        if row['Year'] >= 2025:  # Only adjust future prices
+            year = int(row['Year'])
+            # Calculate cumulative growth since 2024
+            years_since_2024 = year - 2024
+            cumulative_growth = demand_growth * years_since_2024
+            # Apply adjustment
+            data.at[idx, 'Adjusted_Price'] = row['Predicted_Price'] * (1 + cumulative_growth)
+
     # Date input
     selected_date = st.date_input(
         "📅 Select a Date (2015–2028):",
@@ -396,7 +418,9 @@ elif menu_option == "Price Predictor":
         if price_row.empty:
             st.write(f"No price data for {year}-{month:02d}.")
         else:
-            price = price_row['Predicted_Price'].iloc[0]
+            # Display the demand growth label and adjusted price
+            st.markdown("**Predicted Increasing Demand of Cardamom**")
+            price = price_row['Adjusted_Price'].iloc[0]
             st.markdown(f"**Price for {year}-{month:02d}: Rs. {price:.2f}/kg**")
 
             # Prepare graph data
@@ -405,14 +429,15 @@ elif menu_option == "Price Predictor":
                 ((data['Year'] == year) & (data['Month'] <= month))
             ]
 
-            # Create graph
+            # Create graph with adjusted prices
+            st.markdown("**Graph: Predicted Increasing Demand of Cardamom**")
             fig = px.line(
                 graph_data,
                 x='Year_Month',
-                y='Predicted_Price',
+                y='Adjusted_Price',
                 color='Type',
                 title=f"Cardamom Prices (2015 to {year}-{month:02d})",
-                labels={'Year_Month': 'Year', 'Predicted_Price': 'Price (Rs./kg)'}
+                labels={'Year_Month': 'Year', 'Adjusted_Price': 'Price (Rs./kg)'}
             )
             fig.update_traces(line=dict(dash='dot'), selector=dict(name='Predicted'))
             fig.update_xaxes(
