@@ -443,8 +443,7 @@ elif menu_option == "Price Predictor":
             if 'show_actual_prices' not in st.session_state:
                 st.session_state.show_actual_prices = False
 
-            # Create enhanced multi-series graph with new logic
-            st.markdown("**Graph: Cardamom Price Analysis with Training, Test, and Prediction Data**")
+           
             
             # Define the cutoff point (November 2024 = 2024.917)
             cutoff_year_month = 2024 + (11 - 1) / 12  # November 2024 = 2024.917
