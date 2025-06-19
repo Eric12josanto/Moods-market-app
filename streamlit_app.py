@@ -266,6 +266,17 @@ st.markdown("""
         border-radius: 10px;
         display: inline-block;
     }
+    .stCheckbox > label {
+        color: #00008B;
+        font-size: 1.1em;
+    }
+    .stCheckbox > div {
+        background-color: #E0F7E0;
+        border: 2px solid #000000;
+        border-radius: 8px;
+        padding: 10px;
+        color: #000000;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -357,7 +368,7 @@ if menu_option == "Market Insights":
                 <p style="text-align: center; color: #000000;"><i><b>"The graph shows cardamom's month-on-month average price and quantity sold. Based on seasonal trends from 2015–2024 data."</b></i></p>
             """, unsafe_allow_html=True)
 
-# Price Predictor (Updated with Enhanced Multi-Series Graph)
+# Price Predictor (Updated with Enhanced Multi-Series Graph and Toggle)
 elif menu_option == "Price Predictor":
     st.markdown("<h3 class='coin-animation'>Check Cardamom Prices and Trends</h3>", unsafe_allow_html=True)
 
@@ -428,6 +439,10 @@ elif menu_option == "Price Predictor":
             price = price_row['Adjusted_Price'].iloc[0]
             st.markdown(f"**Price for {year}-{month:02d}: Rs. {price:.2f}/kg**")
 
+            # Initialize the toggle state in session state
+            if 'show_actual_prices' not in st.session_state:
+                st.session_state.show_actual_prices = False
+
             # Create enhanced multi-series graph with new logic
             st.markdown("**Graph: Cardamom Price Analysis with Training, Test, and Prediction Data**")
             
@@ -462,7 +477,8 @@ elif menu_option == "Price Predictor":
             ))
             
             # Add actual test data (2022-2024, stops before 2024.917) - Brown dotted line
-            if not actual_test_data.empty:
+            # Only add this trace if the checkbox is checked
+            if st.session_state.show_actual_prices and not actual_test_data.empty:
                 fig.add_trace(go.Scatter(
                     x=actual_test_data['Year_Month'],
                     y=actual_test_data['Actual_Price'],
@@ -518,3 +534,16 @@ elif menu_option == "Price Predictor":
             )
             
             st.plotly_chart(fig, use_container_width=True)
+            
+            # Add toggle for actual prices below the graph
+            show_actual_prices = st.checkbox(
+                "📊 Show Actual Prices",
+                value=st.session_state.show_actual_prices,
+                help="Toggle to show/hide the actual price data from 2022-2024",
+                key="actual_prices_toggle"
+            )
+            
+            # Update session state when checkbox changes
+            if show_actual_prices != st.session_state.show_actual_prices:
+                st.session_state.show_actual_prices = show_actual_prices
+                st.rerun()
