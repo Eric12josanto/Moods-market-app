@@ -126,9 +126,9 @@ elif menu_option == "Price Predictor":
 
     # Load data from the new Excel file with actuals
     try:
-        data = pd.read_excel('combined_prices_with actual.xlsx')
+        data = pd.read_excel('combined_prices_2015_2028.xlsx')
     except FileNotFoundError:
-        st.error("Error: 'combined_prices_with actual.xlsx' not found in the project folder.")
+        st.error("Error: 'combined_prices_2015_2028.xlsx' not found in the project folder.")
         st.stop()
 
     # Prepare data
