@@ -187,7 +187,7 @@ elif menu_option == "Price Predictor":
             cutoff_year_month = 2024 + (11 - 1) / 12  # November 2024 = 2024.917
 
             train_data = data[(data['Year'] >= 2015) & (data['Year'] <= 2021)]
-            actual_test_data = data[(data['Year'] >= 2022) & (data['Year_Month'] <= cutoff_year_month)]
+            actual_test_data = data[(data['Year'] >= 2022)]
             red_line_data = data[(data['Year'] >= 2022) & (data['Year_Month'] <= cutoff_year_month)]
             prediction_data = data[(data['Year'] >= 2022) & (data['Year'] <= year) & 
                                  ((data['Year'] < year) | (data['Month'] <= month))]
